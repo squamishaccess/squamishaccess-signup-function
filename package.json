@@ -1,0 +1,15 @@
+{
+  "name": "squamishaccess-member-signup",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "bent": "^7.1.2",
+    "mailchimp-api-v3": "^1.13.1",
+    "paypal-ipn": "^3.0.0"
+  },
+  "devDependencies": {}
+}
