@@ -2,6 +2,7 @@
 
 // Imports
 var querystring = require('querystring')
+var http = require('http')
 
 var Mailchimp = require('mailchimp-api-v3')
 var bent = require('bent') // A good HTTP client
@@ -37,7 +38,7 @@ module.exports = async function (context, req) {
     if (req.method !== 'POST') {
         context.log(`Request method not allowed. Was: ${req.method}`)
         context.res.statusCode = 405
-        context.res.send('Method Not Allowed')
+        context.res.send(http.STATUS_CODES[context.res.statusCode])
         return
     }
     context.log('PayPal IPN Notification Event received successfully.')
@@ -61,14 +62,22 @@ module.exports = async function (context, req) {
         context.log(
             `Invalid IPN: IPN message for Transaction ID: ${ipnTransactionMessage.txn_id} is invalid.`
         )
+        context.res.statusCode = 500
+        context.res.send(http.STATUS_CODES[context.res.statusCode])
         return
     } else {
         context.log(`Invalid IPN: Unexpected IPN verify response body: ${verifyResponse}`);
+        context.res.statusCode = 500
+        context.res.send(http.STATUS_CODES[context.res.statusCode])
         return
     }
 
     if (ipnTransactionMessage.payment_status !== 'Completed') {
-        context.log(`Payment status was not "Completed": ${ipnTransactionMessage.payment_status}`)
+        context.log(`IPN: Payment status was not "Completed": ${ipnTransactionMessage.payment_status}`)
+        context.res.statusCode = 500
+        context.res.send(http.STATUS_CODES[context.res.statusCode])
+        return
+    }
         return
     }
 
@@ -107,9 +116,11 @@ module.exports = async function (context, req) {
         context.log(`Mailchimp: Successfully subscribed: ${result.email_address}`)
 
         context.res.statusCode = 200
+        context.res.send(http.STATUS_CODES[context.res.statusCode])
     } else {
         context.log('Mailchimp: Unsuccessful result:', result)
         context.res.statusCode = 500
+        context.res.send(http.STATUS_CODES[context.res.statusCode])
     }
     context.res.end()
 };
