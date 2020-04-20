@@ -103,8 +103,6 @@ module.exports = async function (context, req) {
             status: 'pending'
         })
     } catch (err) {
-        context.log('Mailchimp: error status:', result.statusCode, http.STATUS_CODES[result.statusCode])
-
         if (err.errors) {
             context.log('Mailchimp: errors:', err.errors)
         }
