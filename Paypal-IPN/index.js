@@ -93,8 +93,8 @@ module.exports = async function (context, req) {
             context.log('Mailchimp: errors:', err.errors)
         }
 
-        if (error.message.includes(ipnTransactionMessage.payer_email)) {
-            context.log("Mailchimp: signup error:", error.message)
+        if (err.message.includes(ipnTransactionMessage.payer_email)) {
+            context.log("Mailchimp: signup error:", err.message)
             context.res.statusCode = 500
             context.res.end()
             return
