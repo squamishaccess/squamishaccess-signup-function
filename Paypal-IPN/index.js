@@ -89,8 +89,18 @@ module.exports = async function (context, req) {
             status: 'pending'
         })
     } catch (err) {
-        context.log('Mailchimp: errors:', err.errors)
-        throw err
+        if (err.errors) {
+            context.log('Mailchimp: errors:', err.errors)
+        }
+
+        if (error.message.includes(ipnTransactionMessage.payer_email)) {
+            context.log("Mailchimp: signup error:", error.message)
+            context.res.statusCode = 500
+            context.res.end()
+            return
+        } else {
+            throw err
+        }
     }
     if (result.statusCode === 200 &&
         (result.status === 'pending' || result.status === 'subscribed')) {
