@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "bent": "^7.1.2",
-    "mailchimp-api-v3": "^1.13.1",
+    "mailchimp-api-v3": "fishrock123/node-mailchimp#9a1cc5a06abfac2157ffbb77edb42ad9eacdce99",
     "paypal-ipn": "^3.0.0"
   },
   "devDependencies": {}
