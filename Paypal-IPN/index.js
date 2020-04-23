@@ -108,8 +108,8 @@ module.exports = async function (context, req) {
         }
 
         if (err.message.includes(ipnTransactionMessage.payer_email)) {
-            context.log("Mailchimp: signup error:", err.statusCode, err.message)
-            context.res.statusCode = err.statusCode || 500
+            context.log("Mailchimp: signup error:", err.status, err.message)
+            context.res.statusCode = err.status || 500
             context.res.send(http.STATUS_CODES[context.res.statusCode])
             return
         } else {
