@@ -107,8 +107,18 @@ module.exports = async function (context, req) {
             context.log('Mailchimp: errors:', err.errors)
         }
 
+        context.log("Full IPN:", ipnTransactionMessage)
+        context.log("Mailchimp: signup error:", err.status, err.message)
+
         if (err.message.includes(ipnTransactionMessage.payer_email)) {
-            context.log("Mailchimp: signup error:", err.status, err.message)
+            // Assume the user exists in mailchimp or was permenantly removed.
+            // This is to deal with PayPal IPN retry nonsense.
+            // You are not supposted to retry with the same information for
+            // error code 400 but PayPal doesn't care and retries continuously.
+            context.res.statusCode = 200
+            context.res.send(http.STATUS_CODES[context.res.statusCode])
+            return
+        } else if (typeof err.status === 'number') {
             context.res.statusCode = err.status || 500
             context.res.send(http.STATUS_CODES[context.res.statusCode])
             return
