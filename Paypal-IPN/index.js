@@ -8,31 +8,31 @@ var Mailchimp = require('mailchimp-api-v3')
 var bent = require('bent') // A good HTTP client
 
 // Keys and other application settings
-var API_KEY = process.env['MAILCHIMP_API_KEY']
-var LIST_ID = process.env['MAILCHIMP_LIST_ID']
+var API_KEY = process.env.MAILCHIMP_API_KEY
+var LIST_ID = process.env.MAILCHIMP_LIST_ID
 
 /**
  * @const {boolean} sandbox Indicates if the sandbox endpoint is used.
  */
-const sandbox = Boolean(process.env['PAYPAL_SANDBOX']);
+const sandbox = Boolean(process.env.PAYPAL_SANDBOX)
 
 /** Production Postback URL */
-const PRODUCTION_VERIFY_URI = 'https://ipnpb.paypal.com/cgi-bin/webscr';
+const PRODUCTION_VERIFY_URI = 'https://ipnpb.paypal.com/cgi-bin/webscr'
 /** Sandbox Postback URL */
-const SANDBOX_VERIFY_URI = 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr';
+const SANDBOX_VERIFY_URI = 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr'
 
 /**
  * Determine endpoint to post verification data to.
  *
  * @return {String}
  */
-function getPaypalURI() {
-  return sandbox ? SANDBOX_VERIFY_URI : PRODUCTION_VERIFY_URI;
+function getPaypalURI () {
+    return sandbox ? SANDBOX_VERIFY_URI : PRODUCTION_VERIFY_URI
 }
 
 // API setup
 var mailchimp = new Mailchimp(API_KEY)
-var paypal_verify = bent(getPaypalURI(), 'POST', 'string')
+var paypalVerify = bent(getPaypalURI(), 'POST', 'string')
 
 module.exports = async function (context, req) {
     if (req.method !== 'POST') {
@@ -48,12 +48,12 @@ module.exports = async function (context, req) {
     }
 
     // JSON object of the IPN message consisting of transaction details.
-    let ipnTransactionMessage = querystring.parse(req.body);
+    let ipnTransactionMessage = querystring.parse(req.body)
     // req.body is not parsed by Azure and is urlencoded.
     // Build the body of the verification post message by prefixing 'cmd=_notify-validate'.
-    let verificationBody = `cmd=_notify-validate&${req.body}`;
+    let verificationBody = `cmd=_notify-validate&${req.body}`
 
-    const verifyResponse = await paypal_verify('/', verificationBody)
+    const verifyResponse = await paypalVerify('/', verificationBody)
     if (verifyResponse === 'VERIFIED') {
         context.log(
             `Verified IPN: IPN message for Transaction ID: ${ipnTransactionMessage.txn_id} is verified.`
@@ -66,7 +66,7 @@ module.exports = async function (context, req) {
         context.res.send(http.STATUS_CODES[context.res.statusCode])
         return
     } else {
-        context.log(`Invalid IPN: Unexpected IPN verify response body: ${verifyResponse}`);
+        context.log(`Invalid IPN: Unexpected IPN verify response body: ${verifyResponse}`)
         context.res.statusCode = 500
         context.res.send(http.STATUS_CODES[context.res.statusCode])
         return
@@ -107,8 +107,8 @@ module.exports = async function (context, req) {
             context.log('Mailchimp: errors:', err.errors)
         }
 
-        context.log("Full IPN:", ipnTransactionMessage)
-        context.log("Mailchimp: signup error:", err.status, err.message)
+        context.log('Full IPN:', ipnTransactionMessage)
+        context.log('Mailchimp: signup error:', err.status, err.message)
 
         if (err.message.includes(ipnTransactionMessage.payer_email)) {
             // Assume the user exists in mailchimp or was permenantly removed.
@@ -139,4 +139,4 @@ module.exports = async function (context, req) {
         context.res.send(http.STATUS_CODES[context.res.statusCode])
     }
     context.res.end()
-};
+}
