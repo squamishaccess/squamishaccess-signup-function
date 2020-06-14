@@ -82,7 +82,8 @@ module.exports = async function (context, req) {
 
     if (ipnTransactionMessage.txn_type !== 'web_accept') {
         context.log(`IPN: transaction type was not "web_accept": ${ipnTransactionMessage.txn_type}`)
-        context.res.statusCode = 500
+        context.log('Full IPN:', ipnTransactionMessage)
+        context.res.statusCode = 200
         context.res.send(http.STATUS_CODES[context.res.statusCode])
         return
     }
