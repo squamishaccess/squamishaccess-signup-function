@@ -75,7 +75,7 @@ module.exports = async function (context, req) {
     if (ipnTransactionMessage.payment_status !== 'Completed') {
         context.log(`IPN: Payment status was not "Completed": ${ipnTransactionMessage.payment_status}`)
         context.log('Full IPN:', ipnTransactionMessage)
-        context.res.statusCode = 402
+        context.res.statusCode = 200
         context.res.send(http.STATUS_CODES[context.res.statusCode])
         return
     }
